@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sanctix_screening_report_list" model="ir.ui.view">
+        <field name="name">sanctix.screening.report.list</field>
+        <field name="model">sanctix.screening.report</field>
+        <field name="arch" type="xml">
+            <list string="Sanctix Screening Reports" default_order="create_date desc" create="false" edit="false" delete="false">
+                <field name="create_date" string="Screened On"/>
+                <field name="partner_id"/>
+                <field name="screened_name"/>
+                <field name="entity_type"/>
+                <field name="risk_level" decoration-danger="risk_level in ('high','match','error')" decoration-warning="risk_level == 'medium'" decoration-success="risk_level == 'clear'"/>
+                <field name="match_count"/>
+                <field name="triggered_by"/>
+                <field name="report_reference"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sanctix_screening_report_form" model="ir.ui.view">
+        <field name="name">sanctix.screening.report.form</field>
+        <field name="model">sanctix.screening.report</field>
+        <field name="arch" type="xml">
+                <form string="Sanctix Screening Report" create="false" edit="false" delete="false">
+                <sheet>
+                    <field name="risk_badge_html" readonly="1" nolabel="1" class="o_sanctix_badge"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_download_pdf"
+                                type="object"
+                                string="Download PDF"
+                                class="oe_stat_button"
+                                icon="fa-download"/>
+                        <!-- Batch, document and full rows are stored server-side
+                             (GET /reports/{ref}); single-entity screenings return an
+                             ephemeral ref that Sanctix does not keep, so the
+                             button is hidden for those instead of 404ing. -->
+                        <button name="action_view_full_report"
+                                type="object"
+                                string="View Full Report"
+                                class="oe_stat_button"
+                                icon="fa-file-text-o"
+                                invisible="not report_reference or triggered_by not in ('batch', 'document', 'full')"/>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="screened_name"/>
+                            <field name="entity_type"/>
+                            <field name="triggered_by"/>
+                        </group>
+                        <group>
+                            <field name="risk_level"/>
+                            <field name="match_count"/>
+                            <field name="report_reference"/>
+                            <field name="error_message" invisible="not error_message"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Report">
+                            <field name="report_detail_html" readonly="1" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sanctix_screening_report" model="ir.actions.act_window">
+        <field name="name">Screening Reports</field>
+        <field name="res_model">sanctix.screening.report</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_sanctix_root" name="Sanctix Compliance" sequence="85" groups="group_sanctix_user"/>
+    <menuitem id="menu_sanctix_reports" name="Screening Reports" parent="menu_sanctix_root" action="action_sanctix_screening_report" sequence="10"/>
+</odoo>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Settings layout: <app>/<block>/<setting> (the schema on 17/18/19 —
+         the div.settings/o_setting_box markup is 16-era and fails here). -->
+    <record id="res_config_settings_view_form_sanctix" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.sanctix</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="Sanctix Compliance" data-string="Sanctix Compliance" name="sanctix_compliance" groups="sanctix_compliance.group_sanctix_manager">
+                    <block title="Sanctix Sanctions &amp; Compliance Screening" name="sanctix_compliance_block">
+                        <setting string="API Key" help="Get this from your Sanctix dashboard under Settings &gt; API Keys. A blank value here means no key is saved yet for this company.">
+                            <field name="sanctix_api_key" password="True" placeholder="sx_live_..."/>
+                        </setting>
+                        <setting string="Connection">
+                            <button name="action_sanctix_test_connection"
+                                    type="object"
+                                    string="Test Connection"
+                                    class="btn-secondary"/>
+                        </setting>
+                        <setting string="API Base URL" help="Leave as default unless instructed by Sanctix support.">
+                            <field name="sanctix_base_url"/>
+                        </setting>
+                    </block>
+                    <block title="Automatic Screening" name="sanctix_compliance_auto_block">
+                        <setting string="Auto-screen new contacts" help="Screen every new contact automatically as soon as it's created.">
+                            <field name="sanctix_auto_screen_on_create"/>
+                        </setting>
+                        <setting string="Re-screen on name/country change" help="Re-screen a contact automatically if its name or country changes.">
+                            <field name="sanctix_auto_screen_on_write"/>
+                        </setting>
+                        <setting string="Enable scheduled re-screening" help="Periodically re-screen existing contacts even with no changes in Odoo — catches contacts newly added to a sanctions list. Configure the interval under Settings &gt; Technical &gt; Scheduled Actions &gt; 'Sanctix: Re-screen Contacts'.">
+                            <field name="sanctix_scheduled_rescreen_enabled"/>
+                        </setting>
+                        <setting string="Re-screen after (days)" help="The cron re-screens contacts never screened or not screened in the last N days. Lower means more quota usage.">
+                            <field name="sanctix_rescreen_after_days"/>
+                        </setting>
+                        <setting string="Max contacts per cron run" help="Bounded batch per company per cron run so large databases drain gradually instead of timing out.">
+                            <field name="sanctix_cron_batch_size"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_sanctix_settings" model="ir.actions.act_window">
+        <field name="name">Sanctix Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module': 'sanctix_compliance'}</field>
+    </record>
+    <menuitem id="menu_sanctix_settings" name="Configuration" parent="menu_sanctix_root" action="action_sanctix_settings" sequence="99" groups="sanctix_compliance.group_sanctix_manager"/>
+</odoo>

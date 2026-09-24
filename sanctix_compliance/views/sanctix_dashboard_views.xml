@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Charts action first: the dashboard form below references it via
+         %(…)d, which resolves at parse time (no forward refs in one file). -->
+    <record id="action_sanctix_screening_charts" model="ir.actions.act_window">
+        <field name="name">Screening Charts</field>
+        <field name="res_model">sanctix.screening.report</field>
+        <field name="view_mode">graph,pivot</field>
+    </record>
+
+    <record id="view_sanctix_dashboard_form" model="ir.ui.view">
+        <field name="name">sanctix.dashboard.form</field>
+        <field name="model">sanctix.dashboard</field>
+        <field name="arch" type="xml">
+            <form string="Sanctix Compliance Dashboard" create="false" edit="false" delete="false">
+                <sheet>
+                    <field name="brand_html" readonly="1" nolabel="1"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_refresh_quota"
+                                type="object"
+                                string="Refresh Quota"
+                                class="oe_stat_button"
+                                icon="fa-refresh"/>
+                    </div>
+                    <h2>Screening Overview</h2>
+                    <field name="total_reports" invisible="1"/>
+                    <field name="clear_count" invisible="1"/>
+                    <field name="flagged_count" invisible="1"/>
+                    <field name="error_count" invisible="1"/>
+                    <field name="screened_contacts" invisible="1"/>
+                    <field name="kpi_html" readonly="1" nolabel="1"/>
+                    <group>
+                        <group string="Verdict Distribution">
+                            <field name="verdict_donut_html" readonly="1" nolabel="1"/>
+                        </group>
+                        <group string="Hits by Source">
+                            <field name="sources_bar_html" readonly="1" nolabel="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Sanctix Quota (press Refresh Quota)">
+                            <field name="quota_plan" readonly="1"/>
+                            <field name="quota_used" readonly="1"/>
+                            <field name="quota_included" readonly="1"/>
+                        </group>
+                    </group>
+                    <h2>Start Screening</h2>
+                    <div class="d-flex gap-2 mb-3">
+                        <button name="%(sanctix_compliance.action_sanctix_screen_wizard)d"
+                                type="action"
+                                string="Screen a Name"
+                                class="btn-primary"/>
+                        <!-- Explicitly blank partner defaults: without this the
+                             dashboard row id leaks in as default_partner_id(s)
+                             (ghost contact → Missing Record on open). -->
+                        <button name="%(sanctix_compliance.action_sanctix_document_screen_wizard)d"
+                                type="action"
+                                string="Screen a Document"
+                                context="{'default_partner_id': False, 'active_id': False, 'active_model': False}"/>
+                        <button name="%(sanctix_compliance.action_sanctix_batch_screen_wizard)d"
+                                type="action"
+                                string="Screen a Batch"
+                                context="{'default_partner_ids': [(6, 0, [])], 'active_ids': [], 'active_model': False}"/>
+                        <button name="%(sanctix_compliance.action_sanctix_screening_report)d"
+                                type="action"
+                                string="Open Reports"/>
+                        <button name="%(sanctix_compliance.action_sanctix_screening_charts)d"
+                                type="action"
+                                string="Open Charts"/>
+                    </div>
+                    <div class="text-muted">
+                        Batch screening lives on the Contacts list: tick contacts, then
+                        Action menu → "Screen Contacts (Sanctix)".
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Charts: native graph + pivot over the local audit table. -->
+    <record id="view_sanctix_screening_report_graph" model="ir.ui.view">
+        <field name="name">sanctix.screening.report.graph</field>
+        <field name="model">sanctix.screening.report</field>
+        <field name="arch" type="xml">
+            <graph string="Screenings by Risk" type="bar">
+                <field name="risk_level" type="row"/>
+                <field name="match_count" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_sanctix_screening_report_pivot" model="ir.ui.view">
+        <field name="name">sanctix.screening.report.pivot</field>
+        <field name="model">sanctix.screening.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Screening Breakdown">
+                <field name="risk_level" type="row"/>
+                <field name="triggered_by" type="col"/>
+                <field name="match_count" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Dashboard entry: server action returning the singleton form, so the
+         menu opens the dashboard directly instead of a record list. -->
+    <record id="action_sanctix_dashboard_server" model="ir.actions.server">
+        <field name="name">Sanctix Dashboard</field>
+        <field name="model_id" ref="model_sanctix_dashboard"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_open_dashboard()</field>
+    </record>
+
+    <menuitem id="menu_sanctix_dashboard" name="Dashboard" parent="menu_sanctix_root"
+              action="action_sanctix_dashboard_server" sequence="1" groups="group_sanctix_user"/>
+    <menuitem id="menu_sanctix_screen" name="Screen a Name" parent="menu_sanctix_root"
+              action="action_sanctix_screen_wizard" sequence="2" groups="group_sanctix_user"/>
+    <menuitem id="menu_sanctix_charts" name="Charts" parent="menu_sanctix_root"
+              action="action_sanctix_screening_charts" sequence="4" groups="group_sanctix_user"/>
+</odoo>

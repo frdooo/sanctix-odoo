@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ir_cron_sanctix_rescreen" model="ir.cron">
+        <field name="name">Sanctix: Re-screen Contacts</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_sanctix_rescreen()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">weeks</field>
+        <!-- numbercall intentionally omitted: defaults to -1 (repeat
+             forever). The field was removed in Odoo 19, so setting it
+             explicitly breaks 19.0 installs. Likewise `doall` was removed
+             in Odoo 18 — omitted for the same reason. -->
+        <field name="active">True</field>
+    </record>
+</odoo>

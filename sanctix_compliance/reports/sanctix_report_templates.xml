@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Official-style printable screening report (QWeb PDF), modeled on the
+         Sanctix platform report: header, subject + verdict panel, executive
+         summary, at-a-glance donut, per-source coverage, ranked match
+         analysis with signal bars, assessment, review actions, footer.
+         Table-based layout throughout: wkhtmltopdf has no usable flexbox. -->
+    <template id="report_sanctix_official_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="v" t-value="doc._prepare_official_report()"/>
+                <div class="page" style="font-family: Helvetica, Arial, sans-serif; color: #0F172A; font-size: 11px;">
+                    <!-- Header -->
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px;">
+                        <tr>
+                            <td style="vertical-align: middle; white-space: nowrap;">
+                                <t t-if="v['logo_data_uri']">
+                                    <img t-att-src="v['logo_data_uri']" style="height: 44px; vertical-align: middle;"/>
+                                </t>
+                                <span style="display: inline-block; vertical-align: middle; margin-left: 8px;">
+                                    <div style="font-size: 22px; font-weight: 800; letter-spacing: 1px; color: #132A4A;">SANCTIX</div>
+                                    <div style="font-size: 8px; letter-spacing: 3px; color: #64748B;">SANCTIONS INTELLIGENCE</div>
+                                </span>
+                            </td>
+                            <td style="text-align: right; vertical-align: middle;">
+                                <div style="font-size: 13px; font-weight: 700; color: #0F172A;">SANCTIONS SCREENING REPORT</div>
+                                <div style="margin-top: 4px;">
+                                    <span style="background: #B91C1C; color: #FFFFFF; font-weight: 700; font-size: 11px; padding: 3px 10px; border-radius: 3px;" t-esc="v['reference']"/>
+                                </div>
+                                <div style="font-size: 9px; color: #64748B; margin-top: 4px;">Generated: <span t-esc="v['screened_on']"/></div>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- Subject + verdict panel -->
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px;">
+                        <tr>
+                            <td style="width: 58%; vertical-align: top; border: 1px solid #E2E8F0; border-radius: 4px; padding: 10px 12px;">
+                                <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.5px; color: #0F172A; margin-bottom: 6px;">SUBJECT INFORMATION</div>
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <tr>
+                                        <td style="font-size: 9px; color: #64748B; padding: 2px 8px 2px 0;">NAME</td>
+                                        <td style="font-size: 11px; font-weight: 700; color: #B91C1C; padding: 2px 0;" t-esc="doc.screened_name"/>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-size: 9px; color: #64748B; padding: 2px 8px 2px 0;">ENTITY TYPE</td>
+                                        <td style="font-size: 10px; padding: 2px 0;" t-esc="v['entity_type_label']"/>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-size: 9px; color: #64748B; padding: 2px 8px 2px 0;">DATE OF BIRTH</td>
+                                        <td style="font-size: 10px; padding: 2px 0;" t-esc="v['query'].get('dob') or 'Not provided'"/>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-size: 9px; color: #64748B; padding: 2px 8px 2px 0;">NATIONALITY</td>
+                                        <td style="font-size: 10px; padding: 2px 0;" t-esc="v['query'].get('nationality') or 'Not provided'"/>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-size: 9px; color: #64748B; padding: 2px 8px 2px 0;">COUNTRY</td>
+                                        <td style="font-size: 10px; padding: 2px 0;" t-esc="v['query'].get('country') or 'Not provided'"/>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-size: 9px; color: #64748B; padding: 2px 8px 2px 0;">GOVERNMENT ID</td>
+                                        <td style="font-size: 10px; padding: 2px 0;" t-esc="v['query'].get('id_number') or 'Not provided'"/>
+                                    </tr>
+                                </table>
+                                <table style="width: 100%; border-collapse: collapse; margin-top: 6px;">
+                                    <tr>
+                                        <td style="font-size: 9px; color: #64748B; padding: 2px 8px 2px 0;">REPORT ID</td>
+                                        <td style="font-size: 10px; font-weight: 700; padding: 2px 0;" t-esc="v['reference']"/>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-size: 9px; color: #64748B; padding: 2px 8px 2px 0;">SCREENED AT</td>
+                                        <td style="font-size: 10px; padding: 2px 0;" t-esc="v['screened_on']"/>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-size: 9px; color: #64748B; padding: 2px 8px 2px 0;">SOURCE</td>
+                                        <td style="font-size: 10px; padding: 2px 0;" t-esc="v['trigger_label']"/>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-size: 9px; color: #64748B; padding: 2px 8px 2px 0;">SCREENING MODE</td>
+                                        <td style="font-size: 10px; padding: 2px 0;" t-esc="v['threshold_note']"/>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td style="width: 2%;"/>
+                            <td t-attf-style="width: 40%; vertical-align: top; background: #{v['tone']['bg']}; color: #FFFFFF; border-radius: 4px; padding: 12px 14px;">
+                                <div style="font-size: 9px; letter-spacing: 1px; opacity: 0.9;">SCREENING RESULT</div>
+                                <div style="font-size: 20px; font-weight: 800; margin: 2px 0 8px 0;" t-esc="v['verdict_label']"/>
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <tr>
+                                        <td style="font-size: 9px; opacity: 0.9;">SCREENING INDICATOR</td>
+                                        <td style="font-size: 9px; opacity: 0.9; text-align: right;">SCREENING SCORE</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-size: 12px; font-weight: 700;" t-esc="(v['confidence'] or '').replace('_', ' ')"/>
+                                        <td style="font-size: 16px; font-weight: 800; text-align: right;">
+                                            <t t-if="v['score'] is not None"><span t-esc="v['score']"/> / 100</t><t t-else="">—</t>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- Executive summary -->
+                    <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px;">EXECUTIVE SUMMARY</div>
+                    <div style="font-size: 10px; line-height: 1.5; margin-bottom: 10px;" t-esc="v['summary']"/>
+
+                    <!-- At a glance -->
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px;">
+                        <tr>
+                            <td style="vertical-align: top; padding-right: 12px;">
+                                <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px;">SCREENING AT A GLANCE</div>
+                                <div style="font-size: 26px; font-weight: 800;" t-esc="v['total']"/>
+                                <div style="font-size: 9px; color: #64748B;">TOTAL POTENTIAL MATCHES</div>
+                            </td>
+                            <td style="vertical-align: top; text-align: center;">
+                                <svg width="130" height="130" viewBox="0 0 42 42">
+                                    <circle cx="21" cy="21" r="14" fill="none" stroke="#E8EBF0" stroke-width="7"/>
+                                    <t t-foreach="v['segments']" t-as="seg">
+                                        <circle cx="21" cy="21" r="14" fill="none" t-att-stroke="seg['color']" stroke-width="7"
+                                                t-att-stroke-dasharray="'%f %f' % (seg['fraction'] * 87.96, 87.96)"
+                                                t-att-stroke-dashoffset="'%f' % (-seg['offset'] * 87.96)"
+                                                transform="rotate(-90 21 21)"/>
+                                    </t>
+                                </svg>
+                            </td>
+                            <td style="vertical-align: top; padding-left: 8px;">
+                                <t t-foreach="v['segments']" t-as="seg">
+                                    <div style="font-size: 9px; margin-bottom: 3px;">
+                                        <span t-attf-style="display: inline-block; width: 8px; height: 8px; border-radius: 4px; background: #{seg['color']}; margin-right: 4px;"/>
+                                        <span t-esc="seg['label']"/> — <span t-esc="seg['count']"/>
+                                    </div>
+                                </t>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- Coverage -->
+                    <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px;">DATABASE COVERAGE &amp; STATUS</div>
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px;">
+                        <tr>
+                            <t t-foreach="v['coverage']" t-as="cov">
+                                <td style="border: 1px solid #E2E8F0; border-radius: 4px; padding: 8px 10px; vertical-align: top;">
+                                    <div style="font-size: 10px; font-weight: 700;" t-esc="cov['source']"/>
+                                    <div style="margin: 4px 0;">
+                                        <t t-if="cov['count']">
+                                            <span style="font-size: 8px; font-weight: 700; color: #B91C1C; border: 1px solid #FCA5A5; border-radius: 3px; padding: 1px 5px;">POTENTIAL MATCH</span>
+                                        </t><t t-else="">
+                                            <span style="font-size: 8px; font-weight: 700; color: #B45309; border: 1px solid #FCD34D; border-radius: 3px; padding: 1px 5px;">NOT RETURNED</span>
+                                        </t>
+                                    </div>
+                                    <div style="font-size: 9px; color: #64748B;">Top Score: <span t-esc="cov['top']"/>/100</div>
+                                    <div style="font-size: 9px; color: #64748B;">Matches: <span t-esc="cov['count']"/></div>
+                                </td>
+                            </t>
+                            <t t-if="not v['coverage']">
+                                <td style="font-size: 10px; color: #64748B;">No source data in this report.</td>
+                            </t>
+                        </tr>
+                    </table>
+
+                    <!-- Match analysis -->
+                    <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px;">MATCH ANALYSIS</div>
+                    <t t-foreach="v['matches']" t-as="m">
+                        <table style="width: 100%; border-collapse: collapse; border: 1px solid #E2E8F0; border-radius: 4px; margin-bottom: 6px;">
+                            <tr>
+                                <td style="padding: 8px 10px; vertical-align: top;">
+                                    <span style="display: inline-block; width: 18px; height: 18px; background: #B91C1C; color: #fff; font-size: 10px; font-weight: 700; text-align: center; border-radius: 3px; margin-right: 6px;" t-esc="m['rank']"/>
+                                    <span style="font-size: 11px; font-weight: 700; color: #B91C1C;" t-esc="m['name']"/>
+                                    <div style="font-size: 9px; color: #64748B; margin-top: 2px;">
+                                        <span t-esc="m['source']"/> · Source ID: <span t-esc="m['source_id'] or '—'"/> · Program: <span t-esc="m['programs'] or '—'"/>
+                                    </div>
+                                    <div style="font-size: 9px; color: #64748B;">
+                                        Entity Type: <span t-esc="m['entity_type'] or '—'"/> · Listed On: <span t-esc="m['listed_on']"/> · Match: <span t-esc="m['matched_on']"/>
+                                    </div>
+                                </td>
+                                <td style="padding: 8px 10px; text-align: right; vertical-align: top; white-space: nowrap;">
+                                    <span style="font-size: 16px; font-weight: 800;" t-esc="m['score'] if m['score'] is not None else '—'"/>
+                                    <span style="font-size: 10px; color: #64748B;">/100</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </t>
+                    <t t-if="v['extra_matches']">
+                        <div style="font-size: 9px; color: #64748B; margin-bottom: 6px;">+ <span t-esc="v['extra_matches']"/> additional potential match(es) — see Odoo record for the full list.</div>
+                    </t>
+                    <t t-if="not v['matches']">
+                        <div style="font-size: 10px; color: #15803D; margin-bottom: 6px;">No matches — clear against all screened sources.</div>
+                    </t>
+
+                    <!-- Signal breakdown (top match) -->
+                    <t t-if="v['matches']">
+                        <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.5px; margin: 6px 0 4px 0;">MATCH SIGNAL BREAKDOWN (Top Match)</div>
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px;">
+                            <tr style="border-bottom: 1px solid #E2E8F0;">
+                                <td style="font-size: 9px; font-weight: 700; color: #64748B; padding: 3px 0;">SIGNAL</td>
+                                <td style="width: 45%;"/>
+                                <td style="font-size: 9px; font-weight: 700; color: #64748B; text-align: right; padding: 3px 0;">VALUE (POINTS)</td>
+                            </tr>
+                            <t t-foreach="v['matches'][0]['signals']" t-as="sig">
+                                <tr>
+                                    <td style="font-size: 9px; padding: 3px 0;" t-esc="sig['label']"/>
+                                    <td style="padding: 3px 6px;">
+                                        <div style="background: #F1F5F9; height: 7px; border-radius: 2px;">
+                                            <div t-attf-style="background: #B91C1C; height: 7px; border-radius: 2px; width: #{min(100, (sig['value'] or 0) * 100 // 45)}%;"/>
+                                        </div>
+                                    </td>
+                                    <td style="font-size: 9px; text-align: right; padding: 3px 0;" t-esc="sig['value']"/>
+                                </tr>
+                            </t>
+                            <tr>
+                                <td style="font-size: 9px; font-weight: 700; padding: 3px 0;">NAME SUBTOTAL</td>
+                                <td/>
+                                <td style="font-size: 9px; font-weight: 700; text-align: right; padding: 3px 0;" t-esc="v['matches'][0]['name_subtotal']"/>
+                            </tr>
+                            <t t-foreach="v['matches'][0]['corroboration']" t-as="sig">
+                                <tr>
+                                    <td style="font-size: 9px; padding: 3px 0;" t-esc="sig['label']"/>
+                                    <td style="padding: 3px 6px;">
+                                        <div style="background: #F1F5F9; height: 7px; border-radius: 2px;">
+                                            <div t-attf-style="background: #94A3B8; height: 7px; border-radius: 2px; width: #{min(100, abs(sig['value'] or 0) * 100 // 30)}%;"/>
+                                        </div>
+                                    </td>
+                                    <td style="font-size: 9px; text-align: right; padding: 3px 0;" t-esc="sig['value']"/>
+                                </tr>
+                            </t>
+                            <tr style="border-top: 1px solid #0F172A;">
+                                <td style="font-size: 10px; font-weight: 800; padding: 4px 0;">FINAL SCORE</td>
+                                <td/>
+                                <td style="font-size: 11px; font-weight: 800; text-align: right; padding: 4px 0;">
+                                    <span t-esc="v['matches'][0]['final'] if v['matches'][0]['final'] is not None else '—'"/>/100
+                                </td>
+                            </tr>
+                        </table>
+                    </t>
+
+                    <!-- Assessment + review actions -->
+                    <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px;">ASSESSMENT SUMMARY</div>
+                    <div style="font-size: 10px; line-height: 1.5; margin-bottom: 8px;" t-esc="v['assessment']"/>
+                    <t t-if="v['ai_html']">
+                        <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px;">SCREENING ASSESSMENT</div>
+                        <div style="font-size: 8px; color: #64748B; margin-bottom: 4px;">Generated by Sanctix AI from this screening's matches.</div>
+                        <div style="margin-bottom: 8px;"><t t-raw="v['ai_html']"/></div>
+                    </t>
+                    <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px;">REVIEW ACTIONS</div>
+                    <ul style="font-size: 10px; line-height: 1.6; margin: 0 0 10px 16px; padding: 0;">
+                        <li>Compare the submitted subject with the listed records using additional identifying information.</li>
+                        <li>Review the underlying source records and their identifiers.</li>
+                        <li>Obtain additional identity information where available.</li>
+                        <li>Apply your organization's procedures and seek professional advice where appropriate.</li>
+                    </ul>
+
+                    <!-- Footer -->
+                    <table style="width: 100%; border-collapse: collapse; border-top: 2px solid #0F172A; padding-top: 6px;">
+                        <tr>
+                            <td style="font-size: 8px; color: #64748B; vertical-align: top;">
+                                SANCTIX INTELLIGENCE · OFFICIAL SCREENING REPORT<br/>
+                                Local Odoo record — raw API payload retained in the database for audit.<br/>
+                                Informational only; not legal advice, regulatory certification, or official clearance.
+                            </td>
+                            <td style="font-size: 8px; color: #64748B; text-align: right; vertical-align: top;">
+                                Ref: <span t-esc="v['reference']"/><br/>
+                                Generated from Odoo: <span t-esc="v['screened_on']"/>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_sanctix_official" model="ir.actions.report">
+        <field name="name">Sanctix Official Report</field>
+        <field name="model">sanctix.screening.report</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">sanctix_compliance.report_sanctix_official_document</field>
+        <field name="print_report_name">'Sanctix-%s' % (object.screened_name or 'Report').replace(' ', '_')</field>
+        <field name="binding_model_id" ref="model_sanctix_screening_report"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

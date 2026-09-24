@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sanctix_screening_report_user,sanctix.screening.report.user,model_sanctix_screening_report,group_sanctix_user,1,0,0,0
+access_sanctix_screening_report_manager,sanctix.screening.report.manager,model_sanctix_screening_report,group_sanctix_manager,1,1,1,0
+access_sanctix_batch_screen_wizard_user,sanctix.batch.screen.wizard.user,model_sanctix_batch_screen_wizard,group_sanctix_user,1,1,1,0
+access_sanctix_document_screen_wizard_user,sanctix.document.screen.wizard.user,model_sanctix_document_screen_wizard,group_sanctix_user,1,1,1,0
+access_sanctix_screen_wizard_user,sanctix.screen.wizard.user,model_sanctix_screen_wizard,group_sanctix_user,1,1,1,0
+access_sanctix_dashboard_user,sanctix.dashboard.user,model_sanctix_dashboard,group_sanctix_user,1,1,1,0

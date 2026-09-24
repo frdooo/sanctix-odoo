@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_sanctix" model="ir.ui.view">
+        <field name="name">res.partner.form.sanctix</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_sanctix_screen_now"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-shield"
+                        groups="sanctix_compliance.group_sanctix_user">
+                    <field name="sanctix_screening_count" widget="statinfo" string="Screenings"/>
+                </button>
+            </xpath>
+
+            <xpath expr="//div[hasclass('oe_title')]" position="after">
+                <!-- Unrestricted copy of the status field: the ribbons below
+                     read it in `invisible`, and Odoo forbids modifiers that
+                     reference a field visible only to a group (enforced on
+                     17, stricter still on 19). The value is still only
+                     DISPLAYED to Sanctix users (ribbons + page). -->
+                <field name="sanctix_risk_level" invisible="1"/>
+                <widget name="web_ribbon"
+                        title="Sanctions Match"
+                        bg_color="text-bg-danger"
+                        groups="sanctix_compliance.group_sanctix_user"
+                        invisible="sanctix_risk_level != 'match'"/>
+                <widget name="web_ribbon"
+                        title="High Risk"
+                        bg_color="text-bg-warning"
+                        groups="sanctix_compliance.group_sanctix_user"
+                        invisible="sanctix_risk_level != 'high'"/>
+            </xpath>
+
+            <notebook position="inside">
+                <page string="Sanctions Screening" groups="sanctix_compliance.group_sanctix_user">
+                    <field name="sanctix_risk_badge_html" readonly="1" nolabel="1" class="o_sanctix_badge"/>
+                    <group>
+                        <group>
+                            <field name="sanctix_risk_level" readonly="1"/>
+                            <field name="sanctix_last_screened" readonly="1"/>
+                            <field name="sanctix_report_reference" readonly="1"/>
+                        </group>
+                        <group>
+                            <!-- Manager-only: a user who can toggle this off
+                                 for a contact can silently opt it out of all
+                                 future auto-screening and cron re-screening.
+                                 Readable by everyone via groups on the page,
+                                 editable only here by managers. -->
+                            <field name="sanctix_auto_screen" groups="sanctix_compliance.group_sanctix_manager"/>
+                        </group>
+                    </group>
+                    <div class="d-flex gap-2 mb-3">
+                        <button name="action_sanctix_screen_now"
+                                type="object"
+                                string="Screen Now"
+                                class="btn-primary"
+                                groups="sanctix_compliance.group_sanctix_user"/>
+                        <button name="%(action_sanctix_document_screen_wizard)d"
+                                type="action"
+                                string="Screen Document"
+                                groups="sanctix_compliance.group_sanctix_user"/>
+                    </div>
+                    <separator string="Screening History"/>
+                    <field name="sanctix_screening_report_ids" readonly="1">
+                        <list decoration-danger="risk_level in ('high','match','error')" decoration-warning="risk_level == 'medium'" decoration-success="risk_level == 'clear'">
+                            <field name="create_date" string="Screened On"/>
+                            <field name="risk_level"/>
+                            <field name="match_count"/>
+                            <field name="triggered_by"/>
+                            <field name="report_reference"/>
+                        </list>
+                    </field>
+                </page>
+            </notebook>
+        </field>
+    </record>
+
+    <!-- List-view badge so risk status is visible when scanning many
+         contacts at once, not just when opening a record individually. -->
+    <record id="view_partner_list_sanctix" model="ir.ui.view">
+        <field name="name">res.partner.list.sanctix</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="arch" type="xml">
+            <!-- Appended at the end instead of anchored after `name`: Odoo
+                 17's list shows `name`, Odoo 18+ shows `display_name`, so a
+                 name-anchored xpath breaks on one series or the other.
+                 (On the 17.0 branch of this module the parent tag is still
+                 <tree> — use <tree position="inside"> there.) -->
+            <list position="inside">
+                <!-- NOTE: no class= here — Odoo 18+ validates list <field>
+                     attributes strictly and rejects class. -->
+                <field name="sanctix_risk_level" optional="show" decoration-danger="sanctix_risk_level in ('high','match','error')" decoration-warning="sanctix_risk_level == 'medium'" decoration-success="sanctix_risk_level == 'clear'"/>
+            </list>
+        </field>
+    </record>
+</odoo>

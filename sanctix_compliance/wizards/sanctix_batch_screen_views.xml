@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sanctix_batch_screen_wizard_form" model="ir.ui.view">
+        <field name="name">sanctix.batch.screen.wizard.form</field>
+        <field name="model">sanctix.batch.screen.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Screen Contacts via Sanctix">
+                <group>
+                    <field name="partner_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                    <field name="skip_already_clear"/>
+                </group>
+                <footer>
+                    <button name="action_confirm" type="object" string="Screen Now" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sanctix_batch_screen_wizard" model="ir.actions.act_window">
+        <field name="name">Screen Contacts (Sanctix)</field>
+        <field name="res_model">sanctix.batch.screen.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="binding_view_types">list</field>
+        <field name="context">{'default_partner_ids': active_ids}</field>
+    </record>
+</odoo>

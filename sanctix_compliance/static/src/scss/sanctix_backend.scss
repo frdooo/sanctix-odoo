@@ -1,0 +1,32 @@
+// Sanctix polish for Odoo backend views.
+//
+// Mirrors the dashboard language (sanctix-frontend/app/globals.css):
+// sky-600 primary #0284C7, Inter-like system stack, 5px control radius,
+// soft verdict pills. The pills themselves are rendered with inline styles
+// (see models/sanctix_style.py) so they survive without this asset — this
+// file only refines surrounding chrome. Loaded via web.assets_backend,
+// valid on 17/18/19.
+
+$o-sanctix-primary: #0284C7;
+$o-sanctix-primary-dark: #0369A1;
+$o-sanctix-ink: #0B1220;
+$o-sanctix-muted: #5A6577;
+$o-sanctix-line: #E2E8F0;
+
+// Screening tab: friendly reading type + spacing for the badge row.
+.o_sanctix_badge {
+    margin-bottom: 8px;
+
+    span {
+        font-family: -apple-system, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+}
+
+// Sanctix shield stat button: sky icon, tabular count like the dashboard.
+.o_field_widget.o_stat_info .o_stat_value,
+.oe_stat_button .o_stat_info .o_stat_value {
+    font-variant-numeric: tabular-nums;
+}
+
+// Partner list risk column relies on Odoo's decoration-* text tinting
+// (class= is rejected on list <field> by Odoo 18+ view validation).

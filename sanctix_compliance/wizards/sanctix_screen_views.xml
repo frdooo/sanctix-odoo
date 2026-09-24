@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sanctix_screen_wizard_form" model="ir.ui.view">
+        <field name="name">sanctix.screen.wizard.form</field>
+        <field name="model">sanctix.screen.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Screen Any Name via Sanctix">
+                <sheet>
+                    <div class="text-muted mb-3">
+                        Type any person or organization name — like the search box on the
+                        Sanctix platform. "Screen" shows the verdict here (1 screen billed,
+                        nothing saved). "Screen &amp; Save as Contact" additionally files it
+                        on a new Contact without billing twice.
+                    </div>
+                    <group>
+                        <field name="name" placeholder="e.g. Mahan Air"/>
+                        <field name="country_id" options="{'no_create': True}"/>
+                        <field name="dob" placeholder="Optional — sharpens person matches"/>
+                        <field name="include_ai"/>
+                    </group>
+                    <field name="result_verdict" invisible="1"/>
+                    <field name="result_score" invisible="1"/>
+                    <field name="result_ref" invisible="1"/>
+                    <field name="result_ai" invisible="1"/>
+                    <field name="result_is_full" invisible="1"/>
+                    <field name="result_payload" invisible="1"/>
+                    <field name="result_html" readonly="1" nolabel="1" invisible="not result_verdict"/>
+                </sheet>
+                <footer>
+                    <button name="action_screen" type="object" string="Screen" class="btn-primary"/>
+                    <button name="action_screen_and_save" type="object" string="Screen &amp; Save as Contact"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sanctix_screen_wizard" model="ir.actions.act_window">
+        <field name="name">Screen a Name (Sanctix)</field>
+        <field name="res_model">sanctix.screen.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

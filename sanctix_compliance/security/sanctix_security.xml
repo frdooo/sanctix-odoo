@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="module_category_sanctix" model="ir.module.category">
+        <field name="name">Sanctix Compliance</field>
+        <field name="sequence">20</field>
+    </record>
+
+    <record id="group_sanctix_user" model="res.groups">
+        <field name="name">User: Screen Contacts &amp; View Reports</field>
+        <field name="category_id" ref="module_category_sanctix"/>
+        <field name="comment">Can screen contacts manually and via the batch wizard, and view screening history. Cannot change the API key or automation settings.</field>
+    </record>
+
+    <record id="group_sanctix_manager" model="res.groups">
+        <field name="name">Manager: Configure &amp; Manage Screening</field>
+        <field name="category_id" ref="module_category_sanctix"/>
+        <field name="implied_ids" eval="[(4, ref('group_sanctix_user'))]"/>
+        <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+        <field name="comment">Full access: configure the API key, toggle auto-screening behavior, manage the scheduled re-screen job.</field>
+    </record>
+
+    <!-- Multi-company: a screening report belongs to the company it was
+         screened under and must not leak across companies, same as the
+         cross-tenant scoping enforced server-side on the Sanctix API
+         itself — this is the Odoo-side mirror of that boundary. -->
+    <record id="screening_report_company_rule" model="ir.rule">
+        <field name="name">Sanctix Screening Report: multi-company</field>
+        <field name="model_id" ref="model_sanctix_screening_report"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        <field name="groups" eval="[(4, ref('group_sanctix_user'))]"/>
+    </record>
+</odoo>
