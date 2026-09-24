@@ -4,11 +4,13 @@
   external scripts/fonts/stylesheets, no JS) since the app-store renderer
   strips anything else.
 
-  Screenshots: none are embedded yet. Do not fabricate images of screens
-  that haven't been verified against a real running Odoo instance — see
-  the commented placeholders below for where to drop real PNGs
-  (static/description/screenshot_*.png) once captured from an actual
-  install with Phase 1-3 fixes applied.
+  Screenshots: capture from a real running Odoo 18.0 instance with this
+  module installed, at ~1280x800, and save next to this file as:
+    static/description/screenshot_contact.png    (Contact form, Screen Now + risk badge)
+    static/description/screenshot_dashboard.png  (Sanctix Compliance > Dashboard)
+    static/description/screenshot_settings.png   (Settings > Sanctix Compliance, key masked)
+    static/description/screenshot_report.png     (Screening report + Download PDF)
+  Then uncomment the <img> tags below.
 -->
 <section style="font-family: -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif; color:#2b2b2b; max-width: 900px; margin: 0 auto; padding: 24px 16px;">
 
@@ -23,77 +25,94 @@
   </div>
 
   <p style="font-size:15px; line-height:1.6;">
-    Screen every Contact in Odoo against global sanctions lists, PEP registries, and adverse media —
-    without leaving the Contacts app. New contacts are screened automatically, existing ones are
-    re-checked on a schedule, and every result is kept as a permanent, append-only audit record.
+    Screen every Contact in Odoo against 11+ global sanctions lists, PEP registries, and adverse
+    media — without leaving the Contacts app. New contacts are screened automatically, existing
+    ones are re-checked on a schedule, and every result is kept as a permanent, append-only
+    audit record with an official-style printable PDF.
+  </p>
+  <p style="font-size:15px; line-height:1.6;">
+    Learn more at <a href="https://sanctix.com" style="color:#132a4a;">sanctix.com</a>
+    — plans at <a href="https://sanctix.com/pricing" style="color:#132a4a;">sanctix.com/pricing</a>.
   </p>
 
   <h2 style="font-size:20px; border-bottom: 2px solid #eee; padding-bottom:8px; margin-top:32px;">Key features</h2>
-  <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:20px; margin-top:16px;">
-
-    <div>
-      <h3 style="font-size:16px; margin-bottom:4px;">🛡️ One-click screening</h3>
-      <p style="font-size:14px; color:#4a4a4a; line-height:1.5; margin:0;">
-        A "Screen Now" button on every Contact form, with the result and risk level shown right on the record.
-      </p>
-    </div>
-
-    <div>
-      <h3 style="font-size:16px; margin-bottom:4px;">⚙️ Automatic &amp; scheduled screening</h3>
-      <p style="font-size:14px; color:#4a4a4a; line-height:1.5; margin:0;">
-        New contacts are screened on creation; existing ones are re-screened when their name or
-        country changes, and a weekly job catches contacts newly added to a sanctions list.
-      </p>
-    </div>
-
-    <div>
-      <h3 style="font-size:16px; margin-bottom:4px;">📦 Batch screening</h3>
-      <p style="font-size:14px; color:#4a4a4a; line-height:1.5; margin:0;">
-        Select any number of Contacts and screen them in one request via the batch wizard —
-        up to 200 at a time, safely retryable on network failure.
-      </p>
-    </div>
-
-    <div>
-      <h3 style="font-size:16px; margin-bottom:4px;">📜 Full audit trail</h3>
-      <p style="font-size:14px; color:#4a4a4a; line-height:1.5; margin:0;">
-        Every screening call — successful or failed — is logged with its verdict, match count, and
-        the full stored report on demand. A failed API call is always recorded as "Screening Failed",
-        never silently read as "Clear".
-      </p>
-    </div>
-
-    <div>
-      <h3 style="font-size:16px; margin-bottom:4px;">🏢 Multi-company safe</h3>
-      <p style="font-size:14px; color:#4a4a4a; line-height:1.5; margin:0;">
-        API keys are stored per company; screening reports are scoped to the company that ran them.
-      </p>
-    </div>
-
-    <div>
-      <h3 style="font-size:16px; margin-bottom:4px;">🔒 Two-tier access control</h3>
-      <p style="font-size:14px; color:#4a4a4a; line-height:1.5; margin:0;">
-        "Sanctix User" can screen and view history; only "Sanctix Manager" can configure the API
-        key or change automation settings.
-      </p>
-    </div>
-
+  <div style="margin-top:16px;">
+    <h3 style="font-size:16px; margin-bottom:4px;">Screening dashboard</h3>
+    <p style="font-size:14px; color:#4a4a4a; line-height:1.5; margin:0 0 16px;">
+      Sanctix Compliance → Dashboard: KPI tiles (screenings, clearance rate, blocked, contacts
+      screened), verdict donut, hits-by-source charts, and live quota. Native bar/pivot views
+      break down the full audit table.
+    </p>
+    <h3 style="font-size:16px; margin-bottom:4px;">Screen a Name (ad-hoc, no contact needed)</h3>
+    <p style="font-size:14px; color:#4a4a4a; line-height:1.5; margin:0 0 16px;">
+      Type any person or organization, see the verdict with score ring and top matches. Nothing
+      is saved unless you choose Screen &amp; Save. Tick “Include screening assessment (AI)”
+      for the full screening with AI memo (Growth plan with AI enabled) — still 1 screen.
+    </p>
+    <h3 style="font-size:16px; margin-bottom:4px;">One-click + automatic + scheduled screening</h3>
+    <p style="font-size:14px; color:#4a4a4a; line-height:1.5; margin:0 0 16px;">
+      A “Screen Now” button on every Contact form. New contacts are screened on creation,
+      existing ones re-screened when their name or country changes, and a weekly cron job
+      re-checks contacts not screened in the last 30 days — so a contact added to a sanctions
+      list after you cleared them still gets caught.
+    </p>
+    <h3 style="font-size:16px; margin-bottom:4px;">Batch screening (up to 200 at a time)</h3>
+    <p style="font-size:14px; color:#4a4a4a; line-height:1.5; margin:0 0 16px;">
+      Select any number of Contacts in list view and screen them in one request, retried safely
+      on network failure via an idempotency key so a re-click can’t double-screen.
+    </p>
+    <h3 style="font-size:16px; margin-bottom:4px;">Document (OCR) screening</h3>
+    <p style="font-size:14px; color:#4a4a4a; line-height:1.5; margin:0 0 16px;">
+      On any Contact, Screen Document accepts an invoice, bill of lading or packing list
+      (PDF/JPEG/PNG/WebP, max 10&nbsp;MB, max 10 pages). Sanctix extracts the parties named on
+      the file and screens each one — one audit row per party, contact rolls up to the worst
+      verdict. Requires a Growth plan or above.
+    </p>
+    <h3 style="font-size:16px; margin-bottom:4px;">Full audit trail + printable PDF report</h3>
+    <p style="font-size:14px; color:#4a4a4a; line-height:1.5; margin:0 0 16px;">
+      Every call — successful or failed — is logged with verdict, match count, and the full
+      stored report on demand. A failed API call is always recorded as “Screening Failed”,
+      never silently read as “Clear”. Each report prints as an official-style PDF (verdict
+      panel, match analysis with signal bars) via Download PDF.
+    </p>
+    <h3 style="font-size:16px; margin-bottom:4px;">Multi-company safe, two-tier access</h3>
+    <p style="font-size:14px; color:#4a4a4a; line-height:1.5; margin:0;">
+      API keys stored per company; reports scoped to the company that ran them. “Sanctix User”
+      can screen and view history; only “Sanctix Manager” can configure the API key or change
+      automation settings.
+    </p>
   </div>
 
-  <!-- <img src="screenshot_contact_form.png" alt="Screen Now button on a Contact form" style="width:100%; border-radius:8px; border:1px solid #eee; margin-top:24px;"/> -->
-  <!-- <img src="screenshot_batch_wizard.png" alt="Batch screening wizard" style="width:100%; border-radius:8px; border:1px solid #eee; margin-top:24px;"/> -->
-  <!-- <img src="screenshot_settings.png" alt="Sanctix Compliance settings page" style="width:100%; border-radius:8px; border:1px solid #eee; margin-top:24px;"/> -->
+  <!-- Uncomment once real screenshots are captured (see comment at top of file):
+  <img src="screenshot_contact.png" alt="Screen Now button on a Contact form" style="width:100%; border-radius:8px; border:1px solid #eee; margin-top:24px;"/>
+  <img src="screenshot_dashboard.png" alt="Sanctix Compliance dashboard" style="width:100%; border-radius:8px; border:1px solid #eee; margin-top:24px;"/>
+  <img src="screenshot_settings.png" alt="Sanctix Compliance settings page" style="width:100%; border-radius:8px; border:1px solid #eee; margin-top:24px;"/>
+  <img src="screenshot_report.png" alt="Screening report with PDF download" style="width:100%; border-radius:8px; border:1px solid #eee; margin-top:24px;"/>
+  -->
+
+  <h2 style="font-size:20px; border-bottom: 2px solid #eee; padding-bottom:8px; margin-top:32px;">Configuration</h2>
+  <ol style="font-size:14px; line-height:1.7; color:#4a4a4a;">
+    <li>In Sanctix, go to <strong>Settings → API Keys</strong> and create a key (admin role, plan with API access — Starter tier and above).</li>
+    <li>In Odoo, go to <strong>Settings → Sanctix Compliance</strong> (visible to Sanctix Managers).</li>
+    <li>Paste the API key, click <strong>Save</strong>, then <strong>Test Connection</strong> to confirm and see remaining quota.</li>
+    <li>Adjust the automatic-screening toggles (on create, on name/country change, scheduled re-screening — all default on).</li>
+  </ol>
 
   <h2 style="font-size:20px; border-bottom: 2px solid #eee; padding-bottom:8px; margin-top:32px;">Requirements</h2>
   <ul style="font-size:14px; line-height:1.7; color:#4a4a4a;">
-    <li>Odoo 17.0 (18.0 compatibility expected, pending install verification).</li>
-    <li>A Sanctix account on a plan with API access enabled (Starter tier and above).</li>
+    <li>Odoo 18.0 (this branch — the <code>version</code> prefix must match the series).</li>
+    <li>A Sanctix account with API access enabled on your plan (Starter tier and above). Free/Trial plans cannot issue API keys.</li>
+    <li>The <code>requests</code> Python package (bundled with every standard Odoo install).</li>
   </ul>
 
   <h2 style="font-size:20px; border-bottom: 2px solid #eee; padding-bottom:8px; margin-top:32px;">Support</h2>
   <p style="font-size:14px; color:#4a4a4a; line-height:1.6;">
-    Questions or issues — reach out via your Sanctix account contact, or see the module's README
-    for configuration details and troubleshooting notes.
+    Questions or issues — see
+    <a href="https://sanctix.com" style="color:#132a4a;">sanctix.com</a>,
+    <a href="https://sanctix.com/contact" style="color:#132a4a;">contact support</a>,
+    or check the module README for configuration details and troubleshooting notes.
+    Verify a report’s authenticity at
+    <a href="https://sanctix.com/verify" style="color:#132a4a;">sanctix.com/verify</a>.
   </p>
 
 </section>
