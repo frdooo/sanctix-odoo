@@ -1,7 +1,7 @@
 # Sanctix Sanctions & Compliance Screening — Odoo Module
 
-Screens Contacts (`res.partner`) in Odoo against sanctions lists, PEP
-registries, and adverse media using the [Sanctix API](https://sanctix.com),
+Screens Contacts (`res.partner`) in Odoo against 11+ global sanctions
+lists and watchlists using the [Sanctix API](https://sanctix.com),
 without leaving Odoo.
 
 ## What it does

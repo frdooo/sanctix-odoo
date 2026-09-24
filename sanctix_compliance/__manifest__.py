@@ -7,12 +7,12 @@
     # targets the Odoo 18 test instance on this machine.
     "version": "18.0.4.0.0",
     "category": "Compliance",
-    "summary": "Automated sanctions, PEP and adverse media screening for Contacts via the Sanctix API",
+    "summary": "Automated sanctions and watchlist screening for Contacts via the Sanctix API",
     "description": """
 Sanctix Compliance Screening
 =============================
-Screens Contacts (res.partner) against 11+ global sanctions lists, PEP
-registries, and adverse media using the Sanctix API
+Screens Contacts (res.partner) against 11+ global sanctions lists and
+watchlists using the Sanctix API
 (https://sanctix.com), directly from Odoo.
 
 Features
